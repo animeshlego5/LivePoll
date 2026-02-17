@@ -11,10 +11,10 @@ A full-stack web application that lets users create polls, share them via unique
 
 | Layer     | Technology                          |
 | --------- | ----------------------------------- |
-| Frontend  | React 19, Vite, React Router       |
+| Frontend  | React 19                            |
 | Backend   | Node.js, Express                    |
 | Real-Time | Socket.IO (WebSocket)               |
-| Database  | MongoDB Atlas (Mongoose ODM)        |
+| Database  | MongoDB Atlas                       |
 | Hosting   | Vercel (Frontend), Render (Backend) |
 
 ---
@@ -40,38 +40,29 @@ A full-stack web application that lets users create polls, share them via unique
 - Share links remain valid indefinitely.
 
 ### 5. Shareable Link with Copy Button
-- Each poll page includes a "Share this poll" section with a one-click copy button and a visual toast confirmation.
+- Each poll page includes a "Share this poll" section with a one-click copy button.
 
 ---
 
-## Fairness / Anti-Abuse Mechanisms
+## Anti-Abuse Mechanisms
 
-### Mechanism 1: Server-Side IP Hashing (Primary Defense)
+### Mechanism 1: Server-Side IP Hashing 
 
 **What it prevents:** A single user submitting multiple votes on the same poll.
 
 **How it works:**
 - When a vote is submitted via WebSocket, the server captures the voter's IP address from the `x-forwarded-for` header (or direct connection address).
-- The IP is **hashed using SHA-256** (never stored in plain text for privacy) and compared against a list of hashes (`voterIPHashes`) stored in the poll document.
-- If the hash already exists, the vote is **rejected** and the user receives an error: *"You have already voted on this poll."*
-- If the hash is new, the vote is accepted and the hash is added to the list atomically using MongoDB's `$push`.
+- The IP is **hashed using SHA-256** and compared against a list of hashes (`voterIPHashes`) stored in the poll document.
 
-**Why hashing?** Storing raw IPs would be a privacy concern. SHA-256 is a one-way function, so even if the database is compromised, voter IPs cannot be recovered.
-
-> **File:** [`server/socket/pollSocket.js`](server/socket/pollSocket.js)
-
-### Mechanism 2: Client-Side LocalStorage Flag (UX Layer)
+### Mechanism 2: Client-Side LocalStorage Flag 
 
 **What it prevents:** Accidental or casual re-voting from the same browser.
 
 **How it works:**
 - After a vote is submitted, the client stores a flag in the browser's LocalStorage (`voted_poll_<pollId> = true`).
 - On page load, if this flag exists, the voting UI is hidden and the results view is shown directly.
-- This provides immediate feedback without a server round-trip and prevents the user from even seeing the vote form again.
 
-**Limitation:** LocalStorage can be cleared by the user, so this is a UX convenience layer, not a security mechanism. The server-side IP hash check is the authoritative defense.
-
-> **File:** [`client/src/pages/ViewPoll.jsx`](client/src/pages/ViewPoll.jsx)
+**Limitation:** LocalStorage can be cleared by the user, so this is a UX convenience layer, not a security mechanism. 
 
 ---
 
@@ -90,9 +81,6 @@ A full-stack web application that lets users create polls, share them via unique
 | **Invalid option ID in vote**              | Server validates the option exists in the poll before accepting the vote                                      |
 | **Missing pollId or optionId in vote**     | Server validates both fields are present before processing                                                    |
 | **Socket reconnection**                    | Client re-joins the poll room and re-fetches latest data on `connect` event                                   |
-| **Trailing slash in URLs**                 | Both `CLIENT_URL` and `VITE_SERVER_URL` are sanitized to strip trailing slashes                                |
-| **Page refresh on poll route (SPA)**       | `vercel.json` rewrites all routes to `index.html` so React Router handles the routing                         |
-| **CORS restrictions**                      | Server configures CORS to only allow the specific client origin                                                |
 
 ---
 
@@ -106,70 +94,9 @@ A full-stack web application that lets users create polls, share them via unique
 5. **No authentication:** The app is anonymous — there are no user accounts.
 
 ### Future Improvements
-- **Browser fingerprinting** as a third anti-abuse layer (canvas fingerprint, WebGL renderer, etc.)
 - **Rate limiting** on the server to prevent rapid-fire vote attempts
 - **Poll expiration** — allow creators to set a voting deadline
 - **Poll results privacy** — option to hide results until voting ends
-- **User authentication** via OAuth for stronger identity-based vote tracking
-
----
-
-## Project Structure
-
-```
-LivePoll/
-├── client/                  # React frontend (Vite)
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── CreatePoll.jsx    # Poll creation form
-│   │   │   └── ViewPoll.jsx      # Poll viewing, voting, results
-│   │   ├── App.jsx               # Router + Layout
-│   │   ├── socket.js             # Socket.IO client singleton
-│   │   ├── index.css             # Global styles
-│   │   └── main.jsx              # Entry point
-│   ├── vercel.json               # SPA rewrite rules
-│   └── package.json
-│
-├── server/                  # Node.js backend (Express)
-│   ├── models/
-│   │   └── Poll.js               # Mongoose schema
-│   ├── routes/
-│   │   └── polls.js              # REST API (create, fetch polls)
-│   ├── socket/
-│   │   └── pollSocket.js         # WebSocket vote handler
-│   ├── server.js                 # Express + Socket.IO server
-│   └── .env                      # Environment variables
-│
-└── README.md
-```
-
----
-
-## Running Locally
-
-### Prerequisites
-- Node.js (v18+)
-- MongoDB Atlas connection string (or local MongoDB)
-
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/animeshlego5/LivePoll.git
-cd LivePoll
-
-# Backend
-cd server
-npm install
-# Create .env with MONGODB_URI, PORT, CLIENT_URL
-npm start
-
-# Frontend (in a new terminal)
-cd client
-npm install
-# Create .env with VITE_SERVER_URL
-npm run dev
-```
 
 ---
 
