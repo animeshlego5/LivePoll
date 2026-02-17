@@ -123,6 +123,62 @@ body::before {
   color: var(--text-muted);
   font-size: 0.8rem;
   border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition), text-decoration-color var(--transition);
+  border-bottom: 1px solid transparent;
+}
+
+.footer-link:hover {
+  text-decoration: none;
+  border-bottom-color: currentColor;
+}
+
+.source-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.source-code:hover {
+  color: var(--text-primary);
+}
+
+.portfolio-link {
+  font-weight: 700;
+  color: var(--accent-light);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.3);
+}
+
+.portfolio-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.separator {
+  color: var(--border);
+  font-size: 0.6rem;
+}
+
+.credits {
+  color: var(--text-muted);
 }
 
 .card.glass-card {

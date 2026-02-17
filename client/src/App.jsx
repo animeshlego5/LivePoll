@@ -20,6 +20,27 @@ function App() {
         </main>
         <footer className="app-footer">
           <p>Real-time polling — share, vote, see results live.</p>
+          <div className="footer-links">
+            <a
+              href="https://github.com/animeshlego5/LivePoll"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link source-code"
+            >
+              <span className="icon">📂</span> Source Code
+            </a>
+            <span className="separator">•</span>
+            <span className="credits">
+              Created by <a
+                href="https://animeshlego5.github.io/animesh-portfolio/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link portfolio-link"
+              >
+                Animesh
+              </a>
+            </span>
+          </div>
         </footer>
       </div>
     </Router>
